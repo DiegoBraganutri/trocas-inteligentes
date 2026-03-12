@@ -55,10 +55,6 @@ const CAT_ICONS = {
   "Proteína animal": "🍗", "Laticínio": "🧀", "Carboidrato": "🍚",
   "Vegetal": "🥦", "Leguminosa": "🫘", "Gordura saudável": "🥑", "Fruta": "🍎", "Todas": "✨"
 };
-const COMPRA_CAT_ICONS = {
-  "Hortifruti": "🥦", "Proteínas": "🍗", "Laticínios": "🧀", "Grãos e cereais": "🌾",
-  "Óleos e gorduras": "🫒", "Frutas": "🍎", "Outros": "🛒"
-};
 const TOLERANCIAS = { calorico: { kcal: 0.10, ptn: 0.30 }, proteico: { kcal: 0.30, ptn: 0.10 } };
 
 function macros(a, g) {
@@ -86,9 +82,9 @@ function Badge({ label, value, unit = "g", color }) {
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 3,
       background: color + "15", border: `1px solid ${color}30`,
-      borderRadius: 6, padding: "2px 8px", fontSize: 12, color, fontWeight: 600
+      borderRadius: 8, padding: "4px 10px", fontSize: 13, color, fontWeight: 700,
     }}>
-      <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>{label}</span>
+      <span style={{ fontWeight: 500, opacity: 0.65, fontSize: 11 }}>{label}</span>
       {Math.round(value * 10) / 10}{unit}
     </span>
   );
@@ -120,113 +116,162 @@ function AbaTrocas() {
   const mO = selecionado ? macros(selecionado, gramas) : null;
 
   return (
-    <div>
-      <div className="card" style={{ padding: 18, marginBottom: 14 }}>
-        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 13 }}>🎯 Objetivo da troca</p>
+    <div style={{ paddingBottom: 8 }}>
+
+      {/* Objetivo */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>🎯 Objetivo da troca</p>
         <div style={{ display: "flex", gap: 8 }}>
-          {[{ key: "calorico", label: "⚡ Equivalente calórico", sub: "Mesmas kcal" }, { key: "proteico", label: "💪 Equivalente proteico", sub: "Mesma proteína" }].map(op => (
+          {[
+            { key: "calorico", label: "⚡ Calórico", sub: "Mesmas kcal" },
+            { key: "proteico", label: "💪 Proteico", sub: "Mesma proteína" }
+          ].map(op => (
             <button key={op.key} onClick={() => { setObjetivo(op.key); setCalculado(false); }} style={{
-              flex: 1, padding: "10px 12px", borderRadius: 10,
+              flex: 1, padding: "12px 10px", borderRadius: 12,
               border: objetivo === op.key ? "2px solid #6366f1" : "2px solid #e5e7eb",
               background: objetivo === op.key ? "#eef2ff" : "white",
               color: objetivo === op.key ? "#4f46e5" : "#6b7280",
-              fontWeight: 700, fontSize: 12, textAlign: "left", cursor: "pointer",
+              fontWeight: 700, fontSize: 14, textAlign: "left", cursor: "pointer",
+              WebkitTapHighlightColor: "transparent",
             }}>
               <div>{op.label}</div>
-              <div style={{ fontWeight: 400, fontSize: 11, marginTop: 2, opacity: 0.7 }}>{op.sub}</div>
+              <div style={{ fontWeight: 400, fontSize: 12, marginTop: 2, opacity: 0.65 }}>{op.sub}</div>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="card" style={{ padding: 18, marginBottom: 14 }}>
-        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 13 }}>🔍 Selecionar alimento</p>
-        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-          <div style={{ flex: 1, position: "relative" }}>
-            <input value={selecionado ? selecionado.nome : busca}
-              onChange={e => { setBusca(e.target.value); setSelecionado(null); setCalculado(false); setMostrarDropdown(true); }}
-              onFocus={() => setMostrarDropdown(true)}
-              placeholder="Buscar alimento... ex: frango, arroz"
-              style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "2px solid " + (selecionado ? "#10b981" : "#e5e7eb"), fontSize: 13, background: selecionado ? "#f0fdf4" : "white", color: "#111827" }} />
-            {mostrarDropdown && sugestoes.length > 0 && (
-              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "white", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, marginTop: 4, overflow: "hidden" }}>
-                {sugestoes.map(a => (
-                  <div key={a.nome} onClick={() => { setSelecionado(a); setBusca(a.nome); setMostrarDropdown(false); setCalculado(false); }}
-                    style={{ padding: "9px 14px", cursor: "pointer", fontSize: 13, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#f5f3ff"}
-                    onMouseLeave={e => e.currentTarget.style.background = "white"}>
-                    <span>{a.nome}</span>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>{CAT_ICONS[a.categoria]} {a.categoria}</span>
-                  </div>
-                ))}
+      {/* Alimento + Gramas */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>🔍 Alimento de origem</p>
+
+        {/* Busca */}
+        <div style={{ position: "relative", marginBottom: 10 }}>
+          <input
+            value={selecionado ? selecionado.nome : busca}
+            onChange={e => { setBusca(e.target.value); setSelecionado(null); setCalculado(false); setMostrarDropdown(true); }}
+            onFocus={() => setMostrarDropdown(true)}
+            placeholder="Digite o nome do alimento..."
+            style={{
+              width: "100%", padding: "14px 16px", borderRadius: 12,
+              border: "2px solid " + (selecionado ? "#10b981" : "#e5e7eb"),
+              fontSize: 16, background: selecionado ? "#f0fdf4" : "white",
+              color: "#111827", WebkitAppearance: "none",
+            }}
+          />
+          {selecionado && (
+            <button onClick={() => { setSelecionado(null); setBusca(""); setCalculado(false); }}
+              style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", fontSize: 18, color: "#94a3b8", cursor: "pointer", padding: 4 }}>✕</button>
+          )}
+          {mostrarDropdown && sugestoes.length > 0 && (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "white", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 200, marginTop: 4, overflow: "hidden" }}>
+              {sugestoes.map(a => (
+                <div key={a.nome}
+                  onPointerDown={() => { setSelecionado(a); setBusca(a.nome); setMostrarDropdown(false); setCalculado(false); }}
+                  style={{ padding: "14px 16px", cursor: "pointer", fontSize: 15, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#f5f3ff"}
+                  onMouseLeave={e => e.currentTarget.style.background = "white"}>
+                  <span style={{ fontWeight: 600 }}>{a.nome}</span>
+                  <span style={{ fontSize: 12, color: "#94a3b8", marginLeft: 8, whiteSpace: "nowrap" }}>{CAT_ICONS[a.categoria]}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Gramas */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: "0 0 6px", fontWeight: 600, color: "#6b7280", fontSize: 13 }}>Quantidade</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="number" inputMode="numeric" value={gramas}
+                onChange={e => { setGramas(Number(e.target.value)); setCalculado(false); }}
+                style={{ width: 90, padding: "12px 14px", borderRadius: 12, border: "2px solid #e5e7eb", fontSize: 18, fontWeight: 700, textAlign: "center", WebkitAppearance: "none" }} />
+              <span style={{ fontWeight: 700, color: "#374151", fontSize: 16 }}>gramas</span>
+            </div>
+          </div>
+
+          {selecionado && mO && (
+            <div style={{ flex: 1, background: "#f8fafc", borderRadius: 12, padding: "10px 12px" }}>
+              <p style={{ margin: "0 0 6px", fontWeight: 600, color: "#6b7280", fontSize: 11 }}>Macros da porção</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                <Badge label="kcal" value={mO.kcal} unit="" color="#f59e0b" />
+                <Badge label="P" value={mO.ptn} color="#6366f1" />
+                <Badge label="C" value={mO.cho} color="#10b981" />
+                <Badge label="G" value={mO.lip} color="#f43f5e" />
               </div>
-            )}
-          </div>
-          <input type="number" value={gramas} onChange={e => { setGramas(Number(e.target.value)); setCalculado(false); }}
-            style={{ width: 70, padding: "11px 8px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: 13, textAlign: "center" }} />
-          <span style={{ alignSelf: "center", color: "#6b7280", fontSize: 13, fontWeight: 600 }}>g</span>
+            </div>
+          )}
         </div>
-
-        {selecionado && mO && (
-          <div style={{ background: "#f8fafc", borderRadius: 10, padding: "10px 12px", marginBottom: 10, display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center" }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginRight: 4 }}>{selecionado.nome} — {gramas}g</span>
-            <Badge label="Kcal" value={mO.kcal} unit="" color="#f59e0b" />
-            <Badge label="P" value={mO.ptn} color="#6366f1" />
-            <Badge label="C" value={mO.cho} color="#10b981" />
-            <Badge label="G" value={mO.lip} color="#f43f5e" />
-          </div>
-        )}
-
-        <div style={{ marginBottom: 12 }}>
-          <p style={{ margin: "0 0 7px", fontWeight: 600, color: "#6b7280", fontSize: 12 }}>📂 Filtrar por categoria:</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {CATEGORIAS.map(cat => (
-              <button key={cat} onClick={() => { setFiltroCategoria(cat); setCalculado(false); }} style={{
-                padding: "5px 10px", borderRadius: 20, fontSize: 11,
-                border: filtroCategoria === cat ? "2px solid #6366f1" : "1px solid #e5e7eb",
-                background: filtroCategoria === cat ? "#eef2ff" : "white",
-                color: filtroCategoria === cat ? "#4f46e5" : "#6b7280",
-                fontWeight: filtroCategoria === cat ? 700 : 400, cursor: "pointer",
-              }}>{CAT_ICONS[cat]} {cat}</button>
-            ))}
-          </div>
-        </div>
-
-        <button onClick={() => selecionado && setCalculado(true)} disabled={!selecionado} style={{
-          width: "100%", padding: "12px", borderRadius: 10,
-          background: selecionado ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
-          color: selecionado ? "white" : "#9ca3af", border: "none", fontWeight: 800, fontSize: 13,
-        }}>⚡ CALCULAR TROCAS</button>
       </div>
 
+      {/* Filtro categoria */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>📂 Filtrar trocas por categoria</p>
+        <div style={{ display: "flex", overflowX: "auto", gap: 8, paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
+          {CATEGORIAS.map(cat => (
+            <button key={cat} onClick={() => { setFiltroCategoria(cat); setCalculado(false); }}
+              style={{
+                flexShrink: 0, padding: "8px 14px", borderRadius: 20, fontSize: 13,
+                border: filtroCategoria === cat ? "2px solid #6366f1" : "1.5px solid #e5e7eb",
+                background: filtroCategoria === cat ? "#eef2ff" : "white",
+                color: filtroCategoria === cat ? "#4f46e5" : "#6b7280",
+                fontWeight: filtroCategoria === cat ? 700 : 500,
+                cursor: "pointer", whiteSpace: "nowrap",
+                WebkitTapHighlightColor: "transparent",
+              }}>{CAT_ICONS[cat]} {cat}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Botão calcular */}
+      <button onClick={() => selecionado && setCalculado(true)} disabled={!selecionado}
+        style={{
+          width: "100%", padding: "16px", borderRadius: 14, marginBottom: 16,
+          background: selecionado ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
+          color: selecionado ? "white" : "#9ca3af", border: "none",
+          fontWeight: 800, fontSize: 16, letterSpacing: 0.3,
+          WebkitTapHighlightColor: "transparent",
+          boxShadow: selecionado ? "0 4px 16px rgba(99,102,241,0.35)" : "none",
+        }}>
+        ⚡ Calcular Trocas
+      </button>
+
+      {/* Resultados */}
       {calculado && (
         <div>
-          <p style={{ fontWeight: 800, color: "#374151", fontSize: 15, marginBottom: 10 }}>
+          <p style={{ fontWeight: 800, color: "#374151", fontSize: 16, marginBottom: 10 }}>
             🔄 Trocas sugeridas
-            <span style={{ fontWeight: 400, fontSize: 12, color: "#94a3b8", marginLeft: 8 }}>{filtroCategoria !== "Todas" ? filtroCategoria : "Todas as categorias"}</span>
+            <span style={{ fontWeight: 500, fontSize: 13, color: "#94a3b8", marginLeft: 8 }}>
+              {filtroCategoria !== "Todas" ? filtroCategoria : "todas as categorias"}
+            </span>
           </p>
           {trocas.length === 0
-            ? <div className="card" style={{ padding: 20, textAlign: "center", color: "#94a3b8", fontSize: 14 }}>Nenhuma troca encontrada. Tente mudar a categoria ou o objetivo.</div>
-            : <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            ? <div className="card" style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 15 }}>Nenhuma troca encontrada. Tente mudar a categoria ou o objetivo.</div>
+            : <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {trocas.map(({ alimento, gramasDestino, score, macrosDestino }) => (
-                <div key={alimento.nome} className="card troca-card" style={{ padding: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 7 }}>
-                    <div>
-                      <span style={{ fontWeight: 700, color: "#111827", fontSize: 14 }}>{alimento.nome}</span>
-                      <span style={{ marginLeft: 6, fontSize: 11, background: "#f0fdf4", color: "#16a34a", borderRadius: 6, padding: "2px 7px", fontWeight: 700 }}>{CAT_ICONS[alimento.categoria]} {alimento.categoria}</span>
+                <div key={alimento.nome} className="card" style={{ padding: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                    <div style={{ flex: 1, paddingRight: 10 }}>
+                      <div style={{ fontWeight: 700, color: "#111827", fontSize: 15, lineHeight: 1.3 }}>{alimento.nome}</div>
+                      <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 3 }}>{CAT_ICONS[alimento.categoria]} {alimento.categoria}</div>
                     </div>
-                    <div style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", borderRadius: 8, padding: "3px 10px", fontWeight: 800, fontSize: 14, whiteSpace: "nowrap" }}>{gramasDestino}g</div>
+                    <div style={{
+                      background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                      color: "white", borderRadius: 10, padding: "6px 14px",
+                      fontWeight: 900, fontSize: 18, whiteSpace: "nowrap", flexShrink: 0,
+                    }}>{gramasDestino}g</div>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 7 }}>
-                    <Badge label="Kcal" value={macrosDestino.kcal} unit="" color="#f59e0b" />
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                    <Badge label="kcal" value={macrosDestino.kcal} unit="" color="#f59e0b" />
                     <Badge label="P" value={macrosDestino.ptn} color="#6366f1" />
                     <Badge label="C" value={macrosDestino.cho} color="#10b981" />
                     <Badge label="G" value={macrosDestino.lip} color="#f43f5e" />
                   </div>
-                  <div style={{ height: 4, borderRadius: 4, background: "#f1f5f9" }}>
-                    <div style={{ height: "100%", width: `${Math.min(score * 100, 100)}%`, background: "linear-gradient(90deg, #6366f1, #8b5cf6)", borderRadius: 4 }} />
+                  <div style={{ height: 5, borderRadius: 5, background: "#f1f5f9" }}>
+                    <div style={{ height: "100%", width: `${Math.min(score * 100, 100)}%`, background: "linear-gradient(90deg, #6366f1, #8b5cf6)", borderRadius: 5, transition: "width 0.4s ease" }} />
                   </div>
-                  <span style={{ fontSize: 10, color: "#94a3b8", marginTop: 2, display: "block" }}>Similaridade: {Math.round(score * 100)}%</span>
+                  <span style={{ fontSize: 11, color: "#94a3b8", marginTop: 4, display: "block" }}>Similaridade: {Math.round(score * 100)}%</span>
                 </div>
               ))}
             </div>
@@ -255,12 +300,11 @@ function AbaPorcaoInversa() {
     if (!selecionado || !quantidade) return;
     const valorPor100g = selecionado[nutriente];
     if (!valorPor100g || valorPor100g === 0) {
-      setResultado({ erro: `${selecionado.nome} não possui ${nutriente === "ptn" ? "proteína" : nutriente === "kcal" ? "calorias" : nutriente === "cho" ? "carboidrato" : "gordura"} significativa.` });
+      setResultado({ erro: `${selecionado.nome} não possui este nutriente em quantidade significativa.` });
       return;
     }
     const gramas = (quantidade / valorPor100g) * 100;
-    const m = macros(selecionado, gramas);
-    setResultado({ gramas: Math.round(gramas), macros: m });
+    setResultado({ gramas: Math.round(gramas), macros: macros(selecionado, gramas) });
   }
 
   const NUTRIENTES = [
@@ -269,86 +313,101 @@ function AbaPorcaoInversa() {
     { key: "cho", label: "Carboidrato", unit: "g", color: "#10b981", emoji: "🍚" },
     { key: "lip", label: "Gordura", unit: "g", color: "#f43f5e", emoji: "🫒" },
   ];
-  const nutSelecionado = NUTRIENTES.find(n => n.key === nutriente);
+  const nutAtual = NUTRIENTES.find(n => n.key === nutriente);
 
   return (
-    <div>
-      <div className="card" style={{ padding: 18, marginBottom: 14 }}>
-        <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#374151", fontSize: 15 }}>🔁 Calculadora de Porção Inversa</p>
-        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-          Defina a quantidade de um nutriente e descubra quantas gramas do alimento você precisa.
-        </p>
+    <div style={{ paddingBottom: 8 }}>
 
-        {/* Alimento */}
-        <p style={{ margin: "0 0 7px", fontWeight: 700, color: "#374151", fontSize: 13 }}>1. Escolha o alimento</p>
-        <div style={{ position: "relative", marginBottom: 14 }}>
+      {/* Alimento */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>1️⃣ Escolha o alimento</p>
+        <div style={{ position: "relative" }}>
           <input value={selecionado ? selecionado.nome : busca}
             onChange={e => { setBusca(e.target.value); setSelecionado(null); setResultado(null); setMostrarDropdown(true); }}
             onFocus={() => setMostrarDropdown(true)}
-            placeholder="Buscar alimento..."
-            style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "2px solid " + (selecionado ? "#10b981" : "#e5e7eb"), fontSize: 13, background: selecionado ? "#f0fdf4" : "white", color: "#111827" }} />
+            placeholder="Digite o nome do alimento..."
+            style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid " + (selecionado ? "#10b981" : "#e5e7eb"), fontSize: 16, background: selecionado ? "#f0fdf4" : "white", color: "#111827", WebkitAppearance: "none" }} />
+          {selecionado && (
+            <button onClick={() => { setSelecionado(null); setBusca(""); setResultado(null); }}
+              style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", fontSize: 18, color: "#94a3b8", cursor: "pointer", padding: 4 }}>✕</button>
+          )}
           {mostrarDropdown && sugestoes.length > 0 && (
-            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "white", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, marginTop: 4, overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "white", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 200, marginTop: 4, overflow: "hidden" }}>
               {sugestoes.map(a => (
-                <div key={a.nome} onClick={() => { setSelecionado(a); setBusca(a.nome); setMostrarDropdown(false); setResultado(null); }}
-                  style={{ padding: "9px 14px", cursor: "pointer", fontSize: 13, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}
+                <div key={a.nome}
+                  onPointerDown={() => { setSelecionado(a); setBusca(a.nome); setMostrarDropdown(false); setResultado(null); }}
+                  style={{ padding: "14px 16px", cursor: "pointer", fontSize: 15, borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#f5f3ff"}
                   onMouseLeave={e => e.currentTarget.style.background = "white"}>
-                  <span>{a.nome}</span>
-                  <span style={{ fontSize: 11, color: "#94a3b8" }}>{CAT_ICONS[a.categoria]} {a.categoria}</span>
+                  <span style={{ fontWeight: 600 }}>{a.nome}</span>
+                  <span style={{ fontSize: 12, color: "#94a3b8" }}>{CAT_ICONS[a.categoria]}</span>
                 </div>
               ))}
             </div>
           )}
         </div>
+      </div>
 
-        {/* Nutriente */}
-        <p style={{ margin: "0 0 7px", fontWeight: 700, color: "#374151", fontSize: 13 }}>2. Qual nutriente você quer atingir?</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+      {/* Nutriente */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>2️⃣ Qual nutriente quer atingir?</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {NUTRIENTES.map(n => (
             <button key={n.key} onClick={() => { setNutriente(n.key); setResultado(null); }} style={{
-              padding: "10px 12px", borderRadius: 10, textAlign: "left",
+              padding: "14px 12px", borderRadius: 12, textAlign: "left",
               border: nutriente === n.key ? `2px solid ${n.color}` : "2px solid #e5e7eb",
               background: nutriente === n.key ? n.color + "12" : "white",
               color: nutriente === n.key ? n.color : "#6b7280",
-              fontWeight: 700, fontSize: 13, cursor: "pointer",
+              fontWeight: 700, fontSize: 15, cursor: "pointer",
+              WebkitTapHighlightColor: "transparent",
             }}>{n.emoji} {n.label}</button>
           ))}
         </div>
-
-        {/* Quantidade */}
-        <p style={{ margin: "0 0 7px", fontWeight: 700, color: "#374151", fontSize: 13 }}>3. Quantidade desejada</p>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 16 }}>
-          <input type="number" value={quantidade} onChange={e => { setQuantidade(Number(e.target.value)); setResultado(null); }}
-            style={{ width: 100, padding: "11px 14px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: 16, fontWeight: 700, textAlign: "center" }} />
-          <span style={{ fontWeight: 700, color: "#374151", fontSize: 14 }}>{nutSelecionado?.unit} de {nutSelecionado?.label.toLowerCase()}</span>
-        </div>
-
-        <button onClick={calcular} disabled={!selecionado} style={{
-          width: "100%", padding: "12px", borderRadius: 10,
-          background: selecionado ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
-          color: selecionado ? "white" : "#9ca3af", border: "none", fontWeight: 800, fontSize: 13,
-        }}>🔁 CALCULAR PORÇÃO</button>
       </div>
 
+      {/* Quantidade */}
+      <div className="card" style={{ padding: 16, marginBottom: 12 }}>
+        <p style={{ margin: "0 0 10px", fontWeight: 700, color: "#374151", fontSize: 14 }}>3️⃣ Quantidade desejada</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <input type="number" inputMode="numeric" value={quantidade}
+            onChange={e => { setQuantidade(Number(e.target.value)); setResultado(null); }}
+            style={{ width: 110, padding: "14px", borderRadius: 12, border: "2px solid #e5e7eb", fontSize: 22, fontWeight: 800, textAlign: "center", WebkitAppearance: "none" }} />
+          <span style={{ fontWeight: 700, color: "#374151", fontSize: 16 }}>{nutAtual?.unit} de {nutAtual?.label.toLowerCase()}</span>
+        </div>
+      </div>
+
+      {/* Botão */}
+      <button onClick={calcular} disabled={!selecionado}
+        style={{
+          width: "100%", padding: "16px", borderRadius: 14, marginBottom: 16,
+          background: selecionado ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
+          color: selecionado ? "white" : "#9ca3af", border: "none",
+          fontWeight: 800, fontSize: 16,
+          WebkitTapHighlightColor: "transparent",
+          boxShadow: selecionado ? "0 4px 16px rgba(99,102,241,0.35)" : "none",
+        }}>🔁 Calcular Porção</button>
+
+      {/* Resultado */}
       {resultado && (
         resultado.erro
-          ? <div className="card" style={{ padding: 16, background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", fontSize: 13 }}>{resultado.erro}</div>
-          : <div className="card" style={{ padding: 20, textAlign: "center" }}>
-            <p style={{ margin: "0 0 6px", fontSize: 13, color: "#6b7280" }}>Para obter <strong style={{ color: nutSelecionado?.color }}>{quantidade}{nutSelecionado?.unit}</strong> de {nutSelecionado?.label.toLowerCase()} de</p>
-            <p style={{ margin: "0 0 16px", fontWeight: 800, color: "#111827", fontSize: 16 }}>{selecionado?.nome}</p>
+          ? <div className="card" style={{ padding: 16, background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", fontSize: 14 }}>{resultado.erro}</div>
+          : <div className="card" style={{ padding: 24, textAlign: "center" }}>
+            <p style={{ margin: "0 0 4px", fontSize: 14, color: "#6b7280" }}>
+              Para <strong style={{ color: nutAtual?.color }}>{quantidade}{nutAtual?.unit}</strong> de {nutAtual?.label.toLowerCase()}
+            </p>
+            <p style={{ margin: "0 0 20px", fontWeight: 800, color: "#111827", fontSize: 17 }}>{selecionado?.nome}</p>
             <div style={{
-              display: "inline-flex", alignItems: "baseline", gap: 6,
-              background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", borderRadius: 16,
-              padding: "16px 32px", marginBottom: 16,
+              display: "inline-flex", alignItems: "baseline", gap: 8,
+              background: "linear-gradient(135deg, #eef2ff, #f5f3ff)",
+              borderRadius: 20, padding: "18px 36px", marginBottom: 20,
             }}>
-              <span style={{ fontSize: 48, fontWeight: 900, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{resultado.gramas}</span>
-              <span style={{ fontSize: 20, fontWeight: 700, color: "#6366f1" }}>gramas</span>
+              <span style={{ fontSize: 56, fontWeight: 900, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1 }}>{resultado.gramas}</span>
+              <span style={{ fontSize: 22, fontWeight: 700, color: "#6366f1" }}>g</span>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-              <Badge label="Kcal" value={resultado.macros.kcal} unit="" color="#f59e0b" />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+              <Badge label="kcal" value={resultado.macros.kcal} unit="" color="#f59e0b" />
               <Badge label="Proteína" value={resultado.macros.ptn} color="#6366f1" />
-              <Badge label="Carboidrato" value={resultado.macros.cho} color="#10b981" />
+              <Badge label="Carb" value={resultado.macros.cho} color="#10b981" />
               <Badge label="Gordura" value={resultado.macros.lip} color="#f43f5e" />
             </div>
           </div>
@@ -357,379 +416,74 @@ function AbaPorcaoInversa() {
   );
 }
 
-// ─── ABA LISTA DE COMPRAS ─────────────────────────────────────────────────────
-function AbaListaCompras() {
-  const [pdfFile, setPdfFile] = useState(null);
-  const [pdfNome, setPdfNome] = useState("");
-  const [processando, setProcessando] = useState(false);
-  const [lista, setLista] = useState(null);
-  const [erro, setErro] = useState("");
-  const fileRef = useRef();
-
-  function handlePdf(e) {
-    const file = e.target.files[0]; if (!file) return;
-    setPdfFile(file); setPdfNome(file.name); setLista(null); setErro("");
-  }
-
-  async function gerarLista() {
-    if (!pdfFile) return;
-    setProcessando(true); setErro(""); setLista(null);
-    try {
-      const base64 = await new Promise((res, rej) => {
-        const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(pdfFile);
-      });
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
-          messages: [{
-            role: "user", content: [
-              { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } },
-              {
-                type: "text",
-                text: `Analise este plano alimentar e extraia todos os alimentos mencionados. Some as quantidades de alimentos repetidos. Agrupe por categoria de supermercado.
-
-Responda APENAS com JSON válido, sem markdown, sem backticks, sem texto adicional:
-{
-  "categorias": [
-    {
-      "nome": "Proteínas",
-      "itens": [{"alimento": "Frango", "quantidade": "700g"}]
-    },
-    {
-      "nome": "Hortifruti",
-      "itens": [{"alimento": "Brócolis", "quantidade": "300g"}]
-    },
-    {
-      "nome": "Grãos e cereais",
-      "itens": []
-    },
-    {
-      "nome": "Laticínios",
-      "itens": []
-    },
-    {
-      "nome": "Óleos e gorduras",
-      "itens": []
-    },
-    {
-      "nome": "Frutas",
-      "itens": []
-    },
-    {
-      "nome": "Outros",
-      "itens": []
-    }
-  ]
-}
-Inclua apenas categorias com itens. Some quantidades do mesmo alimento (ex: frango aparece em 3 refeições = total em gramas). Se a quantidade não estiver clara, use "a definir".`
-              }
-            ]
-          }]
-        })
-      });
-      const data = await response.json();
-      const texto = data.content?.find(b => b.type === "text")?.text || "";
-      const parsed = JSON.parse(texto.trim());
-      setLista(parsed);
-    } catch (e) {
-      setErro("Não foi possível processar o PDF. Verifique se o arquivo contém texto legível.");
-    }
-    setProcessando(false);
-  }
-
-  function copiarLista() {
-    if (!lista) return;
-    const texto = lista.categorias.map(cat =>
-      `${COMPRA_CAT_ICONS[cat.nome] || "🛒"} ${cat.nome.toUpperCase()}\n` +
-      cat.itens.map(i => `  • ${i.alimento} — ${i.quantidade}`).join("\n")
-    ).join("\n\n");
-    navigator.clipboard.writeText(texto);
-  }
-
-  const totalItens = lista ? lista.categorias.reduce((acc, c) => acc + c.itens.length, 0) : 0;
-
-  return (
-    <div>
-      <div className="card" style={{ padding: 18, marginBottom: 14 }}>
-        <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#374151", fontSize: 15 }}>🛒 Lista de Compras por Plano Alimentar</p>
-        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-          Envie o PDF do plano alimentar. A IA extrai todos os alimentos e gera a lista agrupada por categoria.
-        </p>
-
-        <div onClick={() => fileRef.current.click()} style={{
-          border: "2px dashed " + (pdfFile ? "#6366f1" : "#d1d5db"),
-          borderRadius: 12, padding: "20px", textAlign: "center", cursor: "pointer",
-          background: pdfFile ? "#f5f3ff" : "white", marginBottom: 12, transition: "all 0.2s",
-        }}>
-          {pdfFile ? (
-            <div>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>📄</div>
-              <div style={{ fontWeight: 700, color: "#4f46e5", fontSize: 13 }}>{pdfNome}</div>
-              <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 3 }}>Clique para trocar o arquivo</div>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>📂</div>
-              <div style={{ fontWeight: 600, color: "#6366f1", fontSize: 13 }}>Clique para enviar o PDF</div>
-              <div style={{ color: "#94a3b8", fontSize: 11, marginTop: 3 }}>Plano alimentar em PDF</div>
-            </div>
-          )}
-        </div>
-        <input ref={fileRef} type="file" accept="application/pdf" onChange={handlePdf} style={{ display: "none" }} />
-
-        <button onClick={gerarLista} disabled={!pdfFile || processando} style={{
-          width: "100%", padding: "12px", borderRadius: 10,
-          background: pdfFile && !processando ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
-          color: pdfFile && !processando ? "white" : "#9ca3af",
-          border: "none", fontWeight: 800, fontSize: 13,
-        }}>{processando ? "🔍 Analisando plano alimentar..." : "🛒 GERAR LISTA DE COMPRAS"}</button>
-      </div>
-
-      {erro && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12, padding: "12px 16px", color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{erro}</div>}
-
-      {lista && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <p style={{ fontWeight: 800, color: "#374151", fontSize: 15, margin: 0 }}>
-              🛒 Lista gerada
-              <span style={{ fontWeight: 400, fontSize: 12, color: "#94a3b8", marginLeft: 8 }}>{totalItens} itens</span>
-            </p>
-            <button onClick={copiarLista} style={{
-              padding: "6px 14px", borderRadius: 8, border: "1px solid #e5e7eb",
-              background: "white", color: "#6366f1", fontWeight: 700, fontSize: 12, cursor: "pointer",
-            }}>📋 Copiar</button>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {lista.categorias.filter(c => c.itens.length > 0).map(cat => (
-              <div key={cat.nome} className="card" style={{ padding: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, paddingBottom: 8, borderBottom: "1px solid #f3f4f6" }}>
-                  <span style={{ fontSize: 18 }}>{COMPRA_CAT_ICONS[cat.nome] || "🛒"}</span>
-                  <span style={{ fontWeight: 800, color: "#374151", fontSize: 14 }}>{cat.nome}</span>
-                  <span style={{ marginLeft: "auto", fontSize: 11, background: "#f0f4ff", color: "#6366f1", borderRadius: 20, padding: "2px 8px", fontWeight: 700 }}>{cat.itens.length} {cat.itens.length === 1 ? "item" : "itens"}</span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {cat.itens.map((item, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: i < cat.itens.length - 1 ? "1px dashed #f3f4f6" : "none" }}>
-                      <span style={{ fontSize: 13, color: "#374151" }}>• {item.alimento}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#6366f1", background: "#eef2ff", borderRadius: 6, padding: "2px 8px" }}>{item.quantidade}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── ABA ESCANEAR ─────────────────────────────────────────────────────────────
-function AbaEscanear() {
-  const [subAba, setSubAba] = useState("barcode");
-  const [codigo, setCodigo] = useState("");
-  const [buscando, setBuscando] = useState(false);
-  const [produto, setProduto] = useState(null);
-  const [erro, setErro] = useState("");
-  const [imagemFile, setImagemFile] = useState(null);
-  const [imagemPreview, setImagemPreview] = useState(null);
-  const [analisando, setAnalisando] = useState(false);
-  const [resultadoIA, setResultadoIA] = useState(null);
-  const [erroIA, setErroIA] = useState("");
-  const fileRef = useRef();
-
-  async function buscarCodigo() {
-    if (!codigo.trim()) return;
-    setBuscando(true); setErro(""); setProduto(null);
-    try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo.trim()}.json`);
-      const data = await res.json();
-      if (data.status === 1 && data.product) {
-        const p = data.product, n = p.nutriments || {};
-        const kcalRaw = n["energy-kcal_100g"] ?? (n["energy_100g"] ? Math.round(n["energy_100g"] / 4.184) : 0);
-        setProduto({ nome: p.product_name || "Produto sem nome", marca: p.brands || "—", porcao: p.serving_size || "100g", kcal: kcalRaw, ptn: n.proteins_100g || 0, cho: n.carbohydrates_100g || 0, lip: n.fat_100g || 0, fibra: n.fiber_100g || 0, imagem: p.image_front_small_url || null });
-      } else setErro("Produto não encontrado. Verifique o código de barras.");
-    } catch { setErro("Erro ao buscar. Verifique sua conexão."); }
-    setBuscando(false);
-  }
-
-  function handleImagem(e) {
-    const file = e.target.files[0]; if (!file) return;
-    setImagemFile(file); setResultadoIA(null); setErroIA("");
-    const reader = new FileReader(); reader.onload = ev => setImagemPreview(ev.target.result); reader.readAsDataURL(file);
-  }
-
-  async function analisarRotulo() {
-    if (!imagemFile) return;
-    setAnalisando(true); setErroIA(""); setResultadoIA(null);
-    try {
-      const base64 = await new Promise((res, rej) => {
-        const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(imagemFile);
-      });
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514", max_tokens: 1000,
-          messages: [{ role: "user", content: [
-            { type: "image", source: { type: "base64", media_type: imagemFile.type || "image/jpeg", data: base64 } },
-            { type: "text", text: `Analise este rótulo nutricional. Responda APENAS com JSON válido, sem markdown:\n{"nome":"","porcao":"","kcal_porcao":0,"ptn_porcao":0,"cho_porcao":0,"lip_porcao":0,"fibra_porcao":0,"kcal_100g":0,"ptn_100g":0,"cho_100g":0,"lip_100g":0}` }
-          ]}]
-        })
-      });
-      const data = await response.json();
-      const texto = data.content?.find(b => b.type === "text")?.text || "";
-      setResultadoIA(JSON.parse(texto.trim()));
-    } catch { setErroIA("Não foi possível extrair os dados. Tente uma foto mais nítida."); }
-    setAnalisando(false);
-  }
-
-  return (
-    <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {[{ key: "barcode", label: "📦 Código de Barras" }, { key: "foto", label: "📸 Foto do Rótulo (IA)" }].map(s => (
-          <button key={s.key} onClick={() => { setSubAba(s.key); setErro(""); setErroIA(""); }} style={{
-            flex: 1, padding: "10px", borderRadius: 10, border: subAba === s.key ? "2px solid #6366f1" : "2px solid #e5e7eb",
-            background: subAba === s.key ? "#eef2ff" : "white",
-            color: subAba === s.key ? "#4f46e5" : "#6b7280",
-            fontWeight: 700, fontSize: 12, cursor: "pointer",
-          }}>{s.label}</button>
-        ))}
-      </div>
-
-      {subAba === "barcode" && (
-        <div className="card" style={{ padding: 18 }}>
-          <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#374151", fontSize: 13 }}>Digite o código de barras</p>
-          <p style={{ margin: "0 0 12px", fontSize: 12, color: "#94a3b8" }}>Busca na base Open Food Facts — inclui produtos brasileiros</p>
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-            <input value={codigo} onChange={e => { setCodigo(e.target.value); setProduto(null); setErro(""); }}
-              onKeyDown={e => e.key === "Enter" && buscarCodigo()} placeholder="Ex: 7891000100103"
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: 14 }} />
-            <button onClick={buscarCodigo} disabled={buscando || !codigo.trim()} style={{
-              padding: "11px 16px", borderRadius: 10,
-              background: codigo.trim() ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#e5e7eb",
-              color: codigo.trim() ? "white" : "#9ca3af", border: "none", fontWeight: 700, fontSize: 12, whiteSpace: "nowrap",
-            }}>{buscando ? "Buscando..." : "🔍 Buscar"}</button>
-          </div>
-          {erro && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", color: "#dc2626", fontSize: 13 }}>{erro}</div>}
-          {produto && (
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
-                {produto.imagem && <img src={produto.imagem} alt="" style={{ width: 56, height: 56, objectFit: "contain", borderRadius: 8, background: "white", border: "1px solid #e5e7eb", flexShrink: 0 }} />}
-                <div>
-                  <div style={{ fontWeight: 800, color: "#111827", fontSize: 14 }}>{produto.nome}</div>
-                  <div style={{ color: "#6b7280", fontSize: 12, marginTop: 2 }}>{produto.marca} • Porção: {produto.porcao}</div>
-                </div>
-              </div>
-              <p style={{ margin: "0 0 7px", fontWeight: 700, color: "#374151", fontSize: 12 }}>Por 100g:</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                <Badge label="Kcal" value={produto.kcal} unit="" color="#f59e0b" />
-                <Badge label="Proteína" value={produto.ptn} color="#6366f1" />
-                <Badge label="Carb" value={produto.cho} color="#10b981" />
-                <Badge label="Gordura" value={produto.lip} color="#f43f5e" />
-                {produto.fibra > 0 && <Badge label="Fibra" value={produto.fibra} color="#8b5cf6" />}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {subAba === "foto" && (
-        <div className="card" style={{ padding: 18 }}>
-          <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#374151", fontSize: 13 }}>Foto da tabela nutricional</p>
-          <p style={{ margin: "0 0 12px", fontSize: 12, color: "#94a3b8" }}>A IA lê o rótulo e extrai os macros automaticamente</p>
-          <div onClick={() => fileRef.current.click()} style={{ border: "2px dashed #c4b5fd", borderRadius: 12, padding: "20px", textAlign: "center", cursor: "pointer", marginBottom: 12, background: imagemPreview ? "#f5f3ff" : "white" }}>
-            {imagemPreview
-              ? <img src={imagemPreview} alt="" style={{ maxHeight: 180, maxWidth: "100%", borderRadius: 8, objectFit: "contain" }} />
-              : <div><div style={{ fontSize: 28, marginBottom: 6 }}>📸</div><div style={{ fontWeight: 600, color: "#6366f1", fontSize: 13 }}>Clique para enviar a foto</div><div style={{ color: "#94a3b8", fontSize: 11, marginTop: 3 }}>JPG, PNG ou WEBP</div></div>}
-          </div>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleImagem} style={{ display: "none" }} />
-          {imagemPreview && (
-            <button onClick={analisarRotulo} disabled={analisando} style={{
-              width: "100%", padding: "12px", borderRadius: 10, marginBottom: 12,
-              background: analisando ? "#e5e7eb" : "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              color: analisando ? "#9ca3af" : "white", border: "none", fontWeight: 800, fontSize: 13,
-            }}>{analisando ? "🔍 Analisando com IA..." : "✨ Analisar com IA"}</button>
-          )}
-          {erroIA && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", color: "#dc2626", fontSize: 13, marginBottom: 10 }}>{erroIA}</div>}
-          {resultadoIA && (
-            <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-              <div style={{ fontWeight: 800, color: "#111827", fontSize: 14, marginBottom: 3 }}>{resultadoIA.nome || "Produto analisado"}</div>
-              <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 10 }}>Porção: {resultadoIA.porcao || "—"}</div>
-              {resultadoIA.kcal_porcao > 0 && (
-                <div style={{ marginBottom: 10 }}>
-                  <p style={{ margin: "0 0 6px", fontWeight: 700, color: "#374151", fontSize: 12 }}>Por porção:</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    <Badge label="Kcal" value={resultadoIA.kcal_porcao} unit="" color="#f59e0b" />
-                    <Badge label="P" value={resultadoIA.ptn_porcao} color="#6366f1" />
-                    <Badge label="C" value={resultadoIA.cho_porcao} color="#10b981" />
-                    <Badge label="G" value={resultadoIA.lip_porcao} color="#f43f5e" />
-                  </div>
-                </div>
-              )}
-              {resultadoIA.kcal_100g > 0 && (
-                <div>
-                  <p style={{ margin: "0 0 6px", fontWeight: 700, color: "#374151", fontSize: 12 }}>Por 100g:</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                    <Badge label="Kcal" value={resultadoIA.kcal_100g} unit="" color="#f59e0b" />
-                    <Badge label="P" value={resultadoIA.ptn_100g} color="#6366f1" />
-                    <Badge label="C" value={resultadoIA.cho_100g} color="#10b981" />
-                    <Badge label="G" value={resultadoIA.lip_100g} color="#f43f5e" />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── APP PRINCIPAL ─────────────────────────────────────────────────────────────
 export default function App() {
   const [aba, setAba] = useState("trocas");
-  const ABAS = [
-    { key: "trocas", label: "🔄 Trocas" },
-    { key: "inversa", label: "🔁 Porção Inversa" },
-  ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f8fafc 0%, #f0f4ff 50%, #faf5ff 100%)", fontFamily: "'Nunito', 'Segoe UI', sans-serif", padding: "20px 14px" }}>
+    <div style={{ minHeight: "100vh", minHeight: "100dvh", background: "linear-gradient(160deg, #f8fafc 0%, #f0f4ff 60%, #faf5ff 100%)", fontFamily: "'Nunito', 'Segoe UI', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        input, button { font-family: inherit; }
         input:focus { outline: none; }
-        button { transition: all 0.15s ease; cursor: pointer; }
-        .card { background: white; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
-        .troca-card:hover { box-shadow: 0 4px 24px rgba(99,102,241,0.12); transform: translateY(-2px); }
-        .troca-card { transition: all 0.2s ease; }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 1px 12px rgba(0,0,0,0.07); }
+        body { margin: 0; padding: 0; }
       `}</style>
-      <div style={{ maxWidth: 660, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", background: "white", borderRadius: 10, padding: "5px 14px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: 10, fontSize: 11, color: "#6366f1", fontWeight: 700, letterSpacing: 1 }}>🥗 FERRAMENTA NUTRICIONAL</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, letterSpacing: -1, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Trocas Inteligentes</h1>
-          <p style={{ color: "#94a3b8", marginTop: 5, fontSize: 12 }}>Base TACO + TBCA • Open Food Facts</p>
-        </div>
 
-        {/* Nav */}
-        <div style={{ display: "flex", gap: 5, marginBottom: 16, background: "white", padding: 5, borderRadius: 14, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-          {ABAS.map(a => (
-            <button key={a.key} onClick={() => setAba(a.key)} style={{
-              flex: 1, padding: "9px 4px", borderRadius: 10, border: "none",
-              background: aba === a.key ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "transparent",
-              color: aba === a.key ? "white" : "#6b7280",
-              fontWeight: aba === a.key ? 800 : 600, fontSize: 12, cursor: "pointer",
-            }}>{a.label}</button>
-          ))}
+      {/* Header fixo */}
+      <div style={{
+        position: "sticky", top: 0, zIndex: 100,
+        background: "rgba(248,250,252,0.95)", backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+        padding: "12px 16px 10px",
+      }}>
+        <div style={{ maxWidth: 520, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 10, color: "#6366f1", fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase" }}>🥗 Ferramenta Nutricional</div>
+            <h1 style={{ fontSize: 20, fontWeight: 900, margin: 0, letterSpacing: -0.5, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Trocas Inteligentes</h1>
+          </div>
+          <div style={{ fontSize: 11, color: "#94a3b8", textAlign: "right", lineHeight: 1.5 }}>
+            <div>Base TACO</div>
+            <div>+ TBCA</div>
+          </div>
         </div>
+      </div>
 
+      {/* Conteúdo com scroll */}
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "16px 14px 100px" }}>
         {aba === "trocas" && <AbaTrocas />}
         {aba === "inversa" && <AbaPorcaoInversa />}
+      </div>
 
-        <p style={{ textAlign: "center", color: "#cbd5e1", fontSize: 11, marginTop: 18 }}>Base TACO + TBCA • Open Food Facts • Uso profissional</p>
+      {/* Nav inferior fixo — estilo app mobile */}
+      <div style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
+        background: "rgba(255,255,255,0.97)", backdropFilter: "blur(16px)",
+        borderTop: "1px solid rgba(0,0,0,0.08)",
+        padding: "8px 24px 20px",
+        display: "flex", justifyContent: "center", gap: 8,
+      }}>
+        <div style={{ display: "flex", gap: 6, width: "100%", maxWidth: 520 }}>
+          {[
+            { key: "trocas", icon: "🔄", label: "Trocas" },
+            { key: "inversa", icon: "🔁", label: "Porção" },
+          ].map(a => (
+            <button key={a.key} onClick={() => setAba(a.key)} style={{
+              flex: 1, padding: "10px 8px 8px", borderRadius: 14, border: "none",
+              background: aba === a.key ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "#f1f5f9",
+              color: aba === a.key ? "white" : "#94a3b8",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+              cursor: "pointer", transition: "all 0.15s ease",
+              boxShadow: aba === a.key ? "0 4px 12px rgba(99,102,241,0.3)" : "none",
+            }}>
+              <span style={{ fontSize: 22 }}>{a.icon}</span>
+              <span style={{ fontSize: 12, fontWeight: aba === a.key ? 800 : 600 }}>{a.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
