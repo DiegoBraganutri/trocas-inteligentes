@@ -693,9 +693,7 @@ export default function App() {
   const [aba, setAba] = useState("trocas");
   const ABAS = [
     { key: "trocas", label: "🔄 Trocas" },
-    { key: "inversa", label: "🔁 Porção" },
-    { key: "lista", label: "🛒 Lista" },
-    { key: "escanear", label: "📦 Escanear" },
+    { key: "inversa", label: "🔁 Porção Inversa" },
   ];
 
   return (
@@ -730,8 +728,6 @@ export default function App() {
 
         {aba === "trocas" && <AbaTrocas />}
         {aba === "inversa" && <AbaPorcaoInversa />}
-        {aba === "lista" && <AbaListaCompras />}
-        {aba === "escanear" && <AbaEscanear />}
 
         <p style={{ textAlign: "center", color: "#cbd5e1", fontSize: 11, marginTop: 18 }}>Base TACO + TBCA • Open Food Facts • Uso profissional</p>
       </div>
