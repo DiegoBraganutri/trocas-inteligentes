@@ -123,6 +123,29 @@ const CAT_ICONS = {
 };
 const TOLERANCIAS = { calorico: { kcal: 0.10, ptn: 0.30 }, proteico: { kcal: 0.30, ptn: 0.10 } };
 
+// Alimentos que têm unidade própria (não gramas)
+const UNIDADES = [
+  { match: /ovo.*inteiro/i,  gramas: 50,  unidade: "ovo",   plural: "ovos"   },
+  { match: /ovo.*clara/i,    gramas: 30,  unidade: "clara", plural: "claras" },
+  { match: /ovo.*gema/i,     gramas: 20,  unidade: "gema",  plural: "gemas"  },
+];
+
+function getUnidade(alimento) {
+  return UNIDADES.find(u => u.match.test(alimento.nome)) || null;
+}
+
+// Formata gramas → unidades quando aplicável
+// Retorna { display: "3 ovos", detalhe: "(≈150g)" } ou null se não tiver unidade
+function formatarPorcao(alimento, gramas) {
+  const u = getUnidade(alimento);
+  if (!u) return null;
+  const qtd = gramas / u.gramas;
+  const inteiro = Math.round(qtd);
+  const label = inteiro === 1 ? u.unidade : u.plural;
+  const detalhe = `(≈${Math.round(gramas)}g)`;
+  return { display: String(inteiro), label, detalhe };
+}
+
 function macros(a, g) {
   const f = g / 100;
   return { kcal: a.kcal * f, ptn: a.ptn * f, cho: a.cho * f, lip: a.lip * f };
@@ -299,14 +322,23 @@ function AbaTrocas() {
           {trocas.length === 0
             ? <div className="card" style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 15 }}>Nenhuma troca encontrada. Tente mudar a categoria ou objetivo.</div>
             : <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {trocas.map(({ alimento, gramasDestino, score, macrosDestino }) => (
+              {trocas.map(({ alimento, gramasDestino, score, macrosDestino }) => {
+                const unidade = formatarPorcao(alimento, gramasDestino);
+                return (
                 <div key={alimento.nome} className="card" style={{ padding: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
                     <div style={{ flex: 1, paddingRight: 10 }}>
                       <div style={{ fontWeight: 700, color: "#111827", fontSize: 14, lineHeight: 1.3 }}>{alimento.nome}</div>
                       <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>{CAT_ICONS[alimento.categoria]} {alimento.categoria}</div>
                     </div>
-                    <div style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", borderRadius: 10, padding: "6px 14px", fontWeight: 900, fontSize: 18, whiteSpace: "nowrap", flexShrink: 0 }}>{gramasDestino}g</div>
+                    {unidade ? (
+                      <div style={{ textAlign: "center", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", borderRadius: 10, padding: "6px 14px", flexShrink: 0 }}>
+                        <div style={{ fontWeight: 900, fontSize: 20, lineHeight: 1 }}>{unidade.display} {unidade.label}</div>
+                        <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2 }}>{unidade.detalhe}</div>
+                      </div>
+                    ) : (
+                      <div style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "white", borderRadius: 10, padding: "6px 14px", fontWeight: 900, fontSize: 18, whiteSpace: "nowrap", flexShrink: 0 }}>{gramasDestino}g</div>
+                    )}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                     <Badge label="kcal" value={macrosDestino.kcal} unit="" color="#f59e0b" />
@@ -319,7 +351,8 @@ function AbaTrocas() {
                   </div>
                   <span style={{ fontSize: 11, color: "#94a3b8", marginTop: 4, display: "block" }}>Similaridade: {Math.round(score * 100)}%</span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           }
         </div>
@@ -344,7 +377,8 @@ function AbaPorcaoInversa() {
       return;
     }
     const gramas = (quantidade / valorPor100g) * 100;
-    setResultado({ gramas: Math.round(gramas), macros: macros(selecionado, gramas) });
+    const unidade = formatarPorcao(selecionado, gramas);
+    setResultado({ gramas: Math.round(gramas), macros: macros(selecionado, gramas), unidade });
   }
 
   const NUTRIENTES = [
@@ -407,10 +441,20 @@ function AbaPorcaoInversa() {
               Para <strong style={{ color: nutAtual?.color }}>{quantidade}{nutAtual?.unit}</strong> de {nutAtual?.label.toLowerCase()}
             </p>
             <p style={{ margin: "0 0 20px", fontWeight: 800, color: "#111827", fontSize: 16 }}>{selecionado?.nome}</p>
-            <div style={{ display: "inline-flex", alignItems: "baseline", gap: 6, background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", borderRadius: 20, padding: "18px 36px", marginBottom: 20 }}>
-              <span style={{ fontSize: 56, fontWeight: 900, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1 }}>{resultado.gramas}</span>
-              <span style={{ fontSize: 22, fontWeight: 700, color: "#6366f1" }}>g</span>
-            </div>
+            {resultado.unidade ? (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: "inline-flex", alignItems: "baseline", gap: 8, background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", borderRadius: 20, padding: "18px 36px", marginBottom: 8 }}>
+                  <span style={{ fontSize: 56, fontWeight: 900, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1 }}>{resultado.unidade.display}</span>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: "#6366f1" }}>{resultado.unidade.label}</span>
+                </div>
+                <div style={{ fontSize: 13, color: "#94a3b8" }}>{resultado.unidade.detalhe} · considerando {resultado.unidade.label === "ovo" || resultado.unidade.label === "ovos" ? "50g/ovo" : resultado.unidade.label === "clara" || resultado.unidade.label === "claras" ? "30g/clara" : "20g/gema"}</div>
+              </div>
+            ) : (
+              <div style={{ display: "inline-flex", alignItems: "baseline", gap: 6, background: "linear-gradient(135deg, #eef2ff, #f5f3ff)", borderRadius: 20, padding: "18px 36px", marginBottom: 20 }}>
+                <span style={{ fontSize: 56, fontWeight: 900, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1 }}>{resultado.gramas}</span>
+                <span style={{ fontSize: 22, fontWeight: 700, color: "#6366f1" }}>g</span>
+              </div>
+            )}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
               <Badge label="kcal" value={resultado.macros.kcal} unit="" color="#f59e0b" />
               <Badge label="Proteína" value={resultado.macros.ptn} color="#6366f1" />
