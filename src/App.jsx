@@ -4,20 +4,23 @@ import { useState, useMemo } from "react";
 // Valores por 100g de parte comestível
 const ALIMENTOS = [
   // ─── PROTEÍNA ANIMAL ──────────────────────────────────────────────────────
-  { nome: "Frango, peito, sem pele, grelhado", kcal: 159, ptn: 32.0, cho: 0,   lip: 2.5,  categoria: "Proteína animal" },
-  { nome: "Frango, peito, sem pele, cozido",   kcal: 163, ptn: 31.5, cho: 0,   lip: 3.2,  categoria: "Proteína animal" },
-  { nome: "Carne bovina, patinho, grelhado",   kcal: 219, ptn: 35.9, cho: 0,   lip: 7.3,  categoria: "Proteína animal" },
-  { nome: "Carne bovina, filé mignon, grelhado", kcal: 220, ptn: 32.8, cho: 0, lip: 8.8,  categoria: "Proteína animal" },
-  { nome: "Carne bovina, coxão mole, cozido",  kcal: 219, ptn: 32.4, cho: 0,   lip: 8.9,  categoria: "Proteína animal" },
-  { nome: "Carne bovina, picanha, grelhada",   kcal: 238, ptn: 31.9, cho: 0,   lip: 11.3, categoria: "Proteína animal" },
-  { nome: "Carne bovina, acém, moído, cozido", kcal: 212, ptn: 26.7, cho: 0,   lip: 10.9, categoria: "Proteína animal" },
-  { nome: "Tilápia, filé, grelhado",           kcal: 128, ptn: 26.3, cho: 0,   lip: 2.5,  categoria: "Proteína animal" },
-  { nome: "Salmão, filé, grelhado",            kcal: 229, ptn: 23.9, cho: 0,   lip: 14.0, categoria: "Proteína animal" },
-  { nome: "Sardinha, conserva em óleo",        kcal: 285, ptn: 15.9, cho: 0,   lip: 24.0, categoria: "Proteína animal" },
-  { nome: "Atum em conserva (água)",           kcal: 127, ptn: 28.0, cho: 0,   lip: 1.5,  categoria: "Proteína animal" },
-  { nome: "Ovo de galinha, inteiro, cozido",   kcal: 146, ptn: 13.3, cho: 0.6, lip: 9.5,  categoria: "Proteína animal" },
-  { nome: "Ovo de galinha, clara, cozida",     kcal: 59,  ptn: 13.4, cho: 0,   lip: 0.1,  categoria: "Proteína animal" },
-  { nome: "Ovo de galinha, gema, cozida",      kcal: 353, ptn: 15.9, cho: 1.6, lip: 30.8, categoria: "Proteína animal" },
+  { nome: "Frango, peito, sem pele, grelhado",  kcal: 159, ptn: 32.0, cho: 0,   lip: 2.5,  categoria: "Proteína animal" },
+  { nome: "Frango, peito, sem pele, cozido",    kcal: 163, ptn: 31.5, cho: 0,   lip: 3.2,  categoria: "Proteína animal" },
+  { nome: "Frango, peito, desfiado, cozido",    kcal: 159, ptn: 31.5, cho: 0,   lip: 3.0,  categoria: "Proteína animal" },
+  { nome: "Carne bovina, patinho, grelhado",    kcal: 219, ptn: 35.9, cho: 0,   lip: 7.3,  categoria: "Proteína animal" },
+  { nome: "Carne bovina, filé mignon, grelhado",kcal: 220, ptn: 32.8, cho: 0,   lip: 8.8,  categoria: "Proteína animal" },
+  { nome: "Carne bovina, coxão mole, cozido",   kcal: 219, ptn: 32.4, cho: 0,   lip: 8.9,  categoria: "Proteína animal" },
+  { nome: "Carne bovina, picanha, grelhada",    kcal: 238, ptn: 31.9, cho: 0,   lip: 11.3, categoria: "Proteína animal" },
+  { nome: "Carne bovina, moída, cozida",        kcal: 212, ptn: 26.7, cho: 0,   lip: 10.9, categoria: "Proteína animal" },
+  { nome: "Tilápia, filé, grelhado",            kcal: 128, ptn: 26.3, cho: 0,   lip: 2.5,  categoria: "Proteína animal" },
+  { nome: "Salmão, filé, grelhado",             kcal: 229, ptn: 23.9, cho: 0,   lip: 14.0, categoria: "Proteína animal" },
+  { nome: "Sardinha, conserva em óleo",         kcal: 285, ptn: 15.9, cho: 0,   lip: 24.0, categoria: "Proteína animal" },
+  { nome: "Atum em conserva (água)",            kcal: 127, ptn: 28.0, cho: 0,   lip: 1.5,  categoria: "Proteína animal" },
+  { nome: "Ovo de galinha, inteiro, cozido",    kcal: 146, ptn: 13.3, cho: 0.6, lip: 9.5,  categoria: "Proteína animal" },
+  { nome: "Ovo de galinha, inteiro, frito",     kcal: 215, ptn: 13.4, cho: 0.9, lip: 17.5, categoria: "Proteína animal" },
+  { nome: "Ovo de galinha, clara, cozida",      kcal: 59,  ptn: 13.4, cho: 0,   lip: 0.1,  categoria: "Proteína animal" },
+  { nome: "Ovo de galinha, gema, cozida",       kcal: 353, ptn: 15.9, cho: 1.6, lip: 30.8, categoria: "Proteína animal" },
+  { nome: "Whey protein (pó, 1 scoop ≈ 30g)",  kcal: 120, ptn: 24.0, cho: 3.0, lip: 1.5,  categoria: "Proteína animal" },
 
   // ─── LATICÍNIOS ───────────────────────────────────────────────────────────
   { nome: "Iogurte natural integral",  kcal: 51,  ptn: 4.1,  cho: 1.9, lip: 3.0,  categoria: "Laticínio" },
@@ -31,50 +34,123 @@ const ALIMENTOS = [
   { nome: "Requeijão cremoso",         kcal: 257, ptn: 9.6,  cho: 2.4, lip: 23.4, categoria: "Laticínio" },
 
   // ─── CARBOIDRATOS ─────────────────────────────────────────────────────────
-  { nome: "Arroz branco cozido",       kcal: 128, ptn: 2.5, cho: 28.1, lip: 0.2, categoria: "Carboidrato" },
-  { nome: "Arroz integral cozido",     kcal: 124, ptn: 2.6, cho: 25.8, lip: 1.0, categoria: "Carboidrato" },
-  { nome: "Macarrão cozido",           kcal: 131, ptn: 4.4, cho: 26.7, lip: 0.8, categoria: "Carboidrato" },
-  { nome: "Pão francês",               kcal: 300, ptn: 8.0, cho: 58.0, lip: 3.0, categoria: "Carboidrato" },
-  { nome: "Cuscuz de milho cozido",    kcal: 78,  ptn: 1.8, cho: 16.7, lip: 0.5, categoria: "Carboidrato" },
-  { nome: "Mandioca cozida",           kcal: 125, ptn: 0.6, cho: 30.0, lip: 0.3, categoria: "Carboidrato" },
-  { nome: "Batata doce cozida",        kcal: 77,  ptn: 1.4, cho: 18.0, lip: 0.1, categoria: "Carboidrato" },
-  { nome: "Batata inglesa cozida",     kcal: 56,  ptn: 1.5, cho: 12.6, lip: 0.1, categoria: "Carboidrato" },
-  { nome: "Aveia em flocos",           kcal: 394, ptn: 13.9, cho: 66.6, lip: 8.5, categoria: "Carboidrato" },
-  { nome: "Tapioca (goma)",            kcal: 338, ptn: 0.2, cho: 83.9, lip: 0.2, categoria: "Carboidrato" },
+  { nome: "Arroz branco cozido",    kcal: 128, ptn: 2.5,  cho: 28.1, lip: 0.2, categoria: "Carboidrato" },
+  { nome: "Arroz integral cozido",  kcal: 124, ptn: 2.6,  cho: 25.8, lip: 1.0, categoria: "Carboidrato" },
+  { nome: "Macarrão cozido",        kcal: 131, ptn: 4.4,  cho: 26.7, lip: 0.8, categoria: "Carboidrato" },
+  { nome: "Pão francês",            kcal: 300, ptn: 8.0,  cho: 58.0, lip: 3.0, categoria: "Carboidrato" },
+  { nome: "Cuscuz de milho cozido", kcal: 78,  ptn: 1.8,  cho: 16.7, lip: 0.5, categoria: "Carboidrato" },
+  { nome: "Mandioca cozida",        kcal: 125, ptn: 0.6,  cho: 30.0, lip: 0.3, categoria: "Carboidrato" },
+  { nome: "Batata doce cozida",     kcal: 77,  ptn: 1.4,  cho: 18.0, lip: 0.1, categoria: "Carboidrato" },
+  { nome: "Batata inglesa cozida",  kcal: 56,  ptn: 1.5,  cho: 12.6, lip: 0.1, categoria: "Carboidrato" },
+  { nome: "Aveia em flocos",        kcal: 394, ptn: 13.9, cho: 66.6, lip: 8.5, categoria: "Carboidrato" },
+  { nome: "Tapioca (goma)",         kcal: 338, ptn: 0.2,  cho: 83.9, lip: 0.2, categoria: "Carboidrato" },
 
   // ─── LEGUMINOSAS ──────────────────────────────────────────────────────────
   { nome: "Feijão preto cozido",   kcal: 77, ptn: 4.5, cho: 14.0, lip: 0.5, categoria: "Leguminosa" },
   { nome: "Feijão carioca cozido", kcal: 76, ptn: 4.8, cho: 13.6, lip: 0.5, categoria: "Leguminosa" },
 
   // ─── GORDURAS SAUDÁVEIS ───────────────────────────────────────────────────
-  { nome: "Abacate",                  kcal: 96,  ptn: 1.2,  cho: 6.0,  lip: 8.4,  categoria: "Gordura saudável" },
-  { nome: "Azeite de oliva",          kcal: 884, ptn: 0,    cho: 0,    lip: 100.0, categoria: "Gordura saudável" },
-  { nome: "Amendoim torrado",         kcal: 567, ptn: 25.8, cho: 16.1, lip: 49.2, categoria: "Gordura saudável" },
-  { nome: "Castanha de caju torrada", kcal: 570, ptn: 15.3, cho: 29.3, lip: 46.4, categoria: "Gordura saudável" },
-  { nome: "Pasta de amendoim integral", kcal: 589, ptn: 25.0, cho: 20.0, lip: 50.0, categoria: "Gordura saudável" },
+  { nome: "Abacate",                   kcal: 96,  ptn: 1.2,  cho: 6.0,  lip: 8.4,   categoria: "Gordura saudável" },
+  { nome: "Azeite de oliva",           kcal: 884, ptn: 0,    cho: 0,    lip: 100.0,  categoria: "Gordura saudável" },
+  { nome: "Amendoim torrado",          kcal: 567, ptn: 25.8, cho: 16.1, lip: 49.2,  categoria: "Gordura saudável" },
+  { nome: "Castanha de caju torrada",  kcal: 570, ptn: 15.3, cho: 29.3, lip: 46.4,  categoria: "Gordura saudável" },
+  { nome: "Pasta de amendoim integral",kcal: 589, ptn: 25.0, cho: 20.0, lip: 50.0,  categoria: "Gordura saudável" },
 
   // ─── FRUTAS ───────────────────────────────────────────────────────────────
-  { nome: "Abacaxi",          kcal: 48,  ptn: 0.9, cho: 12.3, lip: 0.1, categoria: "Fruta" },
-  { nome: "Banana nanica",    kcal: 92,  ptn: 1.4, cho: 23.8, lip: 0.1, categoria: "Fruta" },
-  { nome: "Banana prata",     kcal: 98,  ptn: 1.3, cho: 26.0, lip: 0.1, categoria: "Fruta" },
-  { nome: "Banana ouro",      kcal: 112, ptn: 1.5, cho: 29.3, lip: 0.2, categoria: "Fruta" },
-  { nome: "Banana maçã",      kcal: 87,  ptn: 1.8, cho: 22.3, lip: 0.1, categoria: "Fruta" },
-  { nome: "Banana da terra",  kcal: 128, ptn: 1.4, cho: 33.7, lip: 0.2, categoria: "Fruta" },
-  { nome: "Goiaba branca",    kcal: 52,  ptn: 0.9, cho: 12.4, lip: 0.5, categoria: "Fruta" },
-  { nome: "Goiaba vermelha",  kcal: 54,  ptn: 1.1, cho: 13.0, lip: 0.4, categoria: "Fruta" },
-  { nome: "Laranja baía",     kcal: 45,  ptn: 1.0, cho: 11.5, lip: 0.1, categoria: "Fruta" },
-  { nome: "Laranja pera",     kcal: 37,  ptn: 0.9, cho: 8.9,  lip: 0.1, categoria: "Fruta" },
-  { nome: "Maçã fuji",        kcal: 56,  ptn: 0.3, cho: 15.2, lip: 0.0, categoria: "Fruta" },
-  { nome: "Mamão Formosa",    kcal: 45,  ptn: 0.8, cho: 11.6, lip: 0.1, categoria: "Fruta" },
-  { nome: "Mamão Papaia",     kcal: 40,  ptn: 0.5, cho: 10.4, lip: 0.1, categoria: "Fruta" },
-  { nome: "Manga",            kcal: 57,  ptn: 0.7, cho: 14.7, lip: 0.3, categoria: "Fruta" },
-  { nome: "Melancia",         kcal: 33,  ptn: 0.9, cho: 8.1,  lip: 0.0, categoria: "Fruta" },
-  { nome: "Melão",            kcal: 29,  ptn: 0.7, cho: 7.5,  lip: 0.0, categoria: "Fruta" },
-  { nome: "Morango",          kcal: 30,  ptn: 0.9, cho: 6.8,  lip: 0.3, categoria: "Fruta" },
-  { nome: "Tangerina",        kcal: 37,  ptn: 0.7, cho: 9.3,  lip: 0.1, categoria: "Fruta" },
-  { nome: "Uva Itália",       kcal: 53,  ptn: 0.7, cho: 13.6, lip: 0.2, categoria: "Fruta" },
-  { nome: "Uva Rubi",         kcal: 49,  ptn: 0.6, cho: 12.7, lip: 0.2, categoria: "Fruta" },
+  { nome: "Abacaxi",         kcal: 48,  ptn: 0.9, cho: 12.3, lip: 0.1, categoria: "Fruta" },
+  { nome: "Banana nanica",   kcal: 92,  ptn: 1.4, cho: 23.8, lip: 0.1, categoria: "Fruta" },
+  { nome: "Banana prata",    kcal: 98,  ptn: 1.3, cho: 26.0, lip: 0.1, categoria: "Fruta" },
+  { nome: "Banana ouro",     kcal: 112, ptn: 1.5, cho: 29.3, lip: 0.2, categoria: "Fruta" },
+  { nome: "Banana maçã",     kcal: 87,  ptn: 1.8, cho: 22.3, lip: 0.1, categoria: "Fruta" },
+  { nome: "Banana da terra", kcal: 128, ptn: 1.4, cho: 33.7, lip: 0.2, categoria: "Fruta" },
+  { nome: "Goiaba branca",   kcal: 52,  ptn: 0.9, cho: 12.4, lip: 0.5, categoria: "Fruta" },
+  { nome: "Goiaba vermelha", kcal: 54,  ptn: 1.1, cho: 13.0, lip: 0.4, categoria: "Fruta" },
+  { nome: "Laranja baía",    kcal: 45,  ptn: 1.0, cho: 11.5, lip: 0.1, categoria: "Fruta" },
+  { nome: "Laranja pera",    kcal: 37,  ptn: 0.9, cho: 8.9,  lip: 0.1, categoria: "Fruta" },
+  { nome: "Maçã fuji",       kcal: 56,  ptn: 0.3, cho: 15.2, lip: 0.0, categoria: "Fruta" },
+  { nome: "Mamão Formosa",   kcal: 45,  ptn: 0.8, cho: 11.6, lip: 0.1, categoria: "Fruta" },
+  { nome: "Mamão Papaia",    kcal: 40,  ptn: 0.5, cho: 10.4, lip: 0.1, categoria: "Fruta" },
+  { nome: "Manga",           kcal: 57,  ptn: 0.7, cho: 14.7, lip: 0.3, categoria: "Fruta" },
+  { nome: "Melancia",        kcal: 33,  ptn: 0.9, cho: 8.1,  lip: 0.0, categoria: "Fruta" },
+  { nome: "Melão",           kcal: 29,  ptn: 0.7, cho: 7.5,  lip: 0.0, categoria: "Fruta" },
+  { nome: "Morango",         kcal: 30,  ptn: 0.9, cho: 6.8,  lip: 0.3, categoria: "Fruta" },
+  { nome: "Tangerina",       kcal: 37,  ptn: 0.7, cho: 9.3,  lip: 0.1, categoria: "Fruta" },
+  { nome: "Uva Itália",      kcal: 53,  ptn: 0.7, cho: 13.6, lip: 0.2, categoria: "Fruta" },
+  { nome: "Uva Rubi",        kcal: 49,  ptn: 0.6, cho: 12.7, lip: 0.2, categoria: "Fruta" },
 ];
+
+// Porções típicas sugeridas automaticamente ao selecionar o alimento (em gramas)
+const PORCOES_TIPICAS = {
+  // Proteínas — porção de refeição padrão
+  "Frango, peito, sem pele, grelhado":   100,
+  "Frango, peito, sem pele, cozido":     100,
+  "Frango, peito, desfiado, cozido":     100,
+  "Carne bovina, patinho, grelhado":     100,
+  "Carne bovina, filé mignon, grelhado": 100,
+  "Carne bovina, coxão mole, cozido":    100,
+  "Carne bovina, picanha, grelhada":     100,
+  "Carne bovina, moída, cozida":         100,
+  "Tilápia, filé, grelhado":             100,
+  "Salmão, filé, grelhado":              100,
+  "Sardinha, conserva em óleo":           80,
+  "Atum em conserva (água)":              80,
+  "Ovo de galinha, inteiro, cozido":     100, // ≈2 ovos
+  "Ovo de galinha, inteiro, frito":      100, // ≈2 ovos
+  "Ovo de galinha, clara, cozida":        60, // ≈2 claras
+  "Ovo de galinha, gema, cozida":         40, // ≈2 gemas
+  "Whey protein (pó, 1 scoop ≈ 30g)":    30,
+  // Laticínios
+  "Iogurte natural integral":            170,
+  "Iogurte natural desnatado":           170,
+  "Leite de vaca, integral":             200,
+  "Leite de vaca, desnatado":            200,
+  "Queijo prato":                         40, // ≈2 fatias
+  "Queijo muçarela":                      40, // ≈2 fatias
+  "Queijo ricota":                        50,
+  "Queijo cottage":                       80,
+  "Requeijão cremoso":                    30,
+  // Carboidratos — porção de refeição
+  "Arroz branco cozido":                 150,
+  "Arroz integral cozido":               150,
+  "Macarrão cozido":                     150,
+  "Pão francês":                          50, // 1 pão
+  "Cuscuz de milho cozido":              150,
+  "Mandioca cozida":                     100,
+  "Batata doce cozida":                  100,
+  "Batata inglesa cozida":               100,
+  "Aveia em flocos":                      40,
+  "Tapioca (goma)":                       50,
+  // Leguminosas
+  "Feijão preto cozido":                 150,
+  "Feijão carioca cozido":               150,
+  // Gorduras
+  "Abacate":                             100,
+  "Azeite de oliva":                      10,
+  "Amendoim torrado":                     30,
+  "Castanha de caju torrada":             30,
+  "Pasta de amendoim integral":           30,
+  // Frutas — porção padrão
+  "Abacaxi":        80,
+  "Banana nanica":  90,
+  "Banana prata":  100,
+  "Banana ouro":    60,
+  "Banana maçã":    80,
+  "Banana da terra":200,
+  "Goiaba branca":  150,
+  "Goiaba vermelha":150,
+  "Laranja baía":   180,
+  "Laranja pera":   180,
+  "Maçã fuji":      150,
+  "Mamão Formosa":  200,
+  "Mamão Papaia":   200,
+  "Manga":          150,
+  "Melancia":       200,
+  "Melão":          150,
+  "Morango":        100,
+  "Tangerina":      120,
+  "Uva Itália":     100,
+  "Uva Rubi":       100,
+};
 
 const CATEGORIAS = ["Todas", ...Array.from(new Set(ALIMENTOS.map(a => a.categoria)))];
 const CAT_ICONS = {
@@ -87,9 +163,11 @@ const TOLERANCIAS = { calorico: { kcal: 0.10, ptn: 0.30 }, proteico: { kcal: 0.3
 // ref: gramas por unidade usada como referência
 const UNIDADES = [
   // ── Ovos (TACO: ovo médio = 50g) ─────────────────────────────────────────
-  { match: /ovo.*inteiro/i,       ref: 50,  unidade: "ovo",          plural: "ovos",          ref_label: "50g/ovo"    },
-  { match: /ovo.*clara/i,         ref: 30,  unidade: "clara",        plural: "claras",        ref_label: "30g/clara"  },
-  { match: /ovo.*gema/i,          ref: 20,  unidade: "gema",         plural: "gemas",         ref_label: "20g/gema"   },
+  { match: /ovo.*inteiro.*cozido/i,  ref: 50,  unidade: "ovo",   plural: "ovos",   ref_label: "50g/ovo"   },
+  { match: /ovo.*inteiro.*frito/i,   ref: 50,  unidade: "ovo",   plural: "ovos",   ref_label: "50g/ovo"   },
+  { match: /ovo.*inteiro/i,          ref: 50,  unidade: "ovo",   plural: "ovos",   ref_label: "50g/ovo"   },
+  { match: /ovo.*clara/i,            ref: 30,  unidade: "clara", plural: "claras", ref_label: "30g/clara" },
+  { match: /ovo.*gema/i,             ref: 20,  unidade: "gema",  plural: "gemas",  ref_label: "20g/gema"  },
 
   // ── Pão (50g = 1 pão francês médio) ──────────────────────────────────────
   { match: /pão francês/i,        ref: 50,  unidade: "pão",          plural: "pães",          ref_label: "50g/unid."  },
@@ -294,7 +372,7 @@ function ModalAjuda({ titulo, conteudo, onClose }) {
 }
 
 // ─── ABA TROCAS ───────────────────────────────────────────────────────────────
-function AbaTrocas() {
+function AbaTrocas({ historico, onUsar }) {
   const [busca, setBusca] = useState("");
   const [selecionado, setSelecionado] = useState(null);
   const [gramas, setGramas] = useState(100);
@@ -303,10 +381,17 @@ function AbaTrocas() {
   const [calculado, setCalculado] = useState(false);
   const [ajuda, setAjuda] = useState(false);
 
-  // Passos concluídos
   const passo1ok = objetivo !== null;
   const passo2ok = selecionado !== null;
   const passo3ok = gramas > 0;
+
+  function selecionarAlimento(a) {
+    setSelecionado(a);
+    setBusca("");
+    setCalculado(false);
+    setGramas(PORCOES_TIPICAS[a.nome] ?? 100);
+    onUsar(a);
+  }
 
   const trocas = useMemo(() => {
     if (!selecionado || !calculado || !objetivo) return [];
@@ -371,15 +456,38 @@ function AbaTrocas() {
           <BuscaAlimento
             value={busca} selecionado={selecionado}
             onChange={v => { setBusca(v); setSelecionado(null); setCalculado(false); }}
-            onSelect={a => { setSelecionado(a); setBusca(""); setCalculado(false); }}
+            onSelect={selecionarAlimento}
             onClear={() => { setSelecionado(null); setBusca(""); setCalculado(false); }}
           />
+          {/* Histórico de buscas */}
+          {!selecionado && busca.length === 0 && historico.length > 0 && (
+            <div style={{ marginTop: 10 }}>
+              <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, marginBottom: 6 }}>🕓 Buscados recentemente</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {historico.map(h => (
+                  <button key={h.nome} onPointerDown={() => selecionarAlimento(h)}
+                    style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      background: "#f5f3ff", border: "1.5px solid #e0e7ff", color: "#4f46e5", cursor: "pointer" }}>
+                    {h.nome.split(",")[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {!passo2ok && <Dica texto="Digite parte do nome — ex: 'frango', 'arroz', 'banana prata'." />}
 
           {/* Gramas — só aparece após selecionar */}
           {passo2ok && (
             <div style={{ marginTop: 14 }}>
               <StepHeader num="3" titulo="Quantas gramas estão no seu plano?" concluido={passo3ok} ativo={true} />
+              {PORCOES_TIPICAS[selecionado?.nome] && (
+                <div style={{ marginBottom: 8, fontSize: 12, color: "#6366f1", fontWeight: 600 }}>
+                  💡 Porção sugerida: {PORCOES_TIPICAS[selecionado.nome]}g
+                  {(() => { const u = getUnidade(selecionado); if (!u) return null;
+                    const q = Math.round(PORCOES_TIPICAS[selecionado.nome] / u.ref);
+                    return q > 0 ? ` (≈${q} ${q === 1 ? u.unidade : u.plural})` : null; })()}
+                </div>
+              )}
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <input type="number" inputMode="numeric" value={gramas}
                   onChange={e => { setGramas(Number(e.target.value)); setCalculado(false); }}
@@ -534,7 +642,7 @@ function AbaTrocas() {
 }
 
 // ─── ABA PORÇÃO INVERSA ───────────────────────────────────────────────────────
-function AbaPorcaoInversa() {
+function AbaPorcaoInversa({ historico, onUsar }) {
   const [busca, setBusca] = useState("");
   const [selecionado, setSelecionado] = useState(null);
   const [nutriente, setNutriente] = useState(null);
@@ -545,6 +653,13 @@ function AbaPorcaoInversa() {
   const passo1ok = selecionado !== null;
   const passo2ok = nutriente !== null;
   const passo3ok = quantidade > 0;
+
+  function selecionarAlimento(a) {
+    setSelecionado(a);
+    setBusca("");
+    setResultado(null);
+    onUsar(a);
+  }
 
   const NUTRIENTES = [
     { key: "ptn",  label: "Proteína",    unit: "g",    color: "#6366f1", emoji: "💪", ex: "Ex: 30g de proteína" },
@@ -593,9 +708,24 @@ function AbaPorcaoInversa() {
         <BuscaAlimento
           value={busca} selecionado={selecionado}
           onChange={v => { setBusca(v); setSelecionado(null); setResultado(null); }}
-          onSelect={a => { setSelecionado(a); setBusca(""); setResultado(null); }}
+          onSelect={selecionarAlimento}
           onClear={() => { setSelecionado(null); setBusca(""); setResultado(null); }}
         />
+        {/* Histórico */}
+        {!selecionado && busca.length === 0 && historico.length > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, marginBottom: 6 }}>🕓 Buscados recentemente</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {historico.map(h => (
+                <button key={h.nome} onPointerDown={() => selecionarAlimento(h)}
+                  style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600,
+                    background: "#f0fdf4", border: "1.5px solid #bbf7d0", color: "#059669", cursor: "pointer" }}>
+                  {h.nome.split(",")[0]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {!passo1ok && <Dica texto="Ex: 'ovo cozido', 'frango grelhado', 'banana prata'. Escolha o alimento que vai consumir." />}
       </div>
 
@@ -725,6 +855,14 @@ function AbaPorcaoInversa() {
 // ─── APP PRINCIPAL ─────────────────────────────────────────────────────────────
 export default function App() {
   const [aba, setAba] = useState("trocas");
+  const [historico, setHistorico] = useState([]); // últimas buscas compartilhadas
+
+  function adicionarHistorico(alimento) {
+    setHistorico(prev => {
+      const sem = prev.filter(h => h.nome !== alimento.nome);
+      return [alimento, ...sem].slice(0, 5);
+    });
+  }
 
   return (
     <div style={{ minHeight: "100dvh", background: "linear-gradient(160deg,#f8fafc 0%,#f0f4ff 60%,#faf5ff 100%)", fontFamily: "'Nunito','Segoe UI',sans-serif" }}>
@@ -760,8 +898,8 @@ export default function App() {
 
       {/* Conteúdo */}
       <div style={{ maxWidth: 520, margin: "0 auto", padding: "16px 14px 100px" }}>
-        {aba === "trocas"  && <AbaTrocas />}
-        {aba === "inversa" && <AbaPorcaoInversa />}
+        {aba === "trocas"  && <AbaTrocas  historico={historico} onUsar={adicionarHistorico} />}
+        {aba === "inversa" && <AbaPorcaoInversa historico={historico} onUsar={adicionarHistorico} />}
       </div>
 
       {/* Nav inferior */}
